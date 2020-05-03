@@ -1,1 +1,82 @@
-<p>alumno works!</p>
+<p-confirmDialog [style]="{width: '50vw'}"></p-confirmDialog>
+<p-toast position="top-right"></p-toast>
+<div class="container mt-4">
+    <button type="button" class="btn btn-primary m-1" (click)="Limpiar()" data-toggle="modal" data-target="#exampleModal" >
+        <i class="fas fa-user-plus"></i> Agregar
+    </button>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido Paterno</th>
+            <th scope="col">Apellido Materno</th>
+            <th scope="col">Carrera</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let res of ListaAlumno">
+            <th scope="row">{{res.idAlumo}}</th>
+            <td>{{res.nombre}}</td>
+            <td>{{res.apellidoPaterno}}</td>
+            <td>{{res.apellidoMaterno}}</td>
+            <td>{{res.carrera}}</td>
+            <td>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary m-1" (click)="verEditar(res.idAlumo,res.nombre,res.apellidoPaterno,
+                    res.apellidoMaterno,res.carrera)"  data-toggle="modal" data-target="#exampleModal"><i class="fas fa-user-edit"></i></button>
+                    <button type="button" class="btn btn-danger m-1" (click)="ConfirmarEliminar(res.idAlumo,res.nombre,res.apellidoPaterno,
+                    res.apellidoMaterno)"><i class="far fa-trash-alt"></i></button>
+                </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            
+            <form [formGroup] = "AlumnosFrom">
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Nombre(s)</label>
+                  <input type="text" class="form-control" placeholder="Escribe tu Nombre(s)" formControlName="Nombre">
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputPassword1">Apellido Paterno</label>
+                  <input type="text" class="form-control" placeholder="Escribe tu Apellido Paterno" formControlName="ApellidoPaterno">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword2">Apellido Materno</label>
+                    <input type="text" class="form-control" placeholder="Escribe tu Apellido Materno" formControlName="ApellidoMaterno">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Carrera</label>
+                    <input type="text" class="form-control" placeholder="Escribe tu Carrera" formControlName="Carrera">
+                </div>              
+              </form>
+              <pre>
+                  {{AlumnosFrom.value | json}}
+              </pre>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
+          <button type="button" class="btn btn-primary" (click)="Guardar()" *ngIf= "btnGuardar"> Guardar</button>
+          <button type="button" class="btn btn-primary" (click)="Editar()" *ngIf= "btnEditar"> Editar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <button type="button" pButton icon="pi pi-check" label="Confirm"></button>
