@@ -3,6 +3,7 @@ import {CnnService} from '../server/cnn.service'
 import {MessageService, ConfirmationService} from 'primeng/api';
 
 import {FormControl,FormGroup,Validators} from '@angular/forms';
+import * as signalR from '@aspnet/signalr';
 
 
 @Component({
@@ -12,6 +13,11 @@ import {FormControl,FormGroup,Validators} from '@angular/forms';
   providers: [MessageService,ConfirmationService]
 })
 export class AlumnoComponent implements OnInit {
+
+  //Hub
+  private _hubConnection:signalR.HubConnection;
+  zeldaHub = "https://localhost:44393/hubAlertas";
+  //
 
   AlumnosFrom: FormGroup;
   msgs:any[]=[];
@@ -27,6 +33,7 @@ export class AlumnoComponent implements OnInit {
     private confirmationService: ConfirmationService) { }
 
   ngOnInit() {
+    this.ConnectionHub();
     this.verAlumno();
     this.FromInit();
   }
@@ -87,13 +94,13 @@ export class AlumnoComponent implements OnInit {
   Eliminar(id){
     this.cnn.Eliminar(id).subscribe(res=> {
       console.log(res);
-      if(res){
-        this.verAlumno();
-        this.messageService.add({severity:'success', summary: 'Registro Eliminado', detail:'Order submitted'});
-      }
-      else{
-        this.messageService.add({severity:'error', summary: 'Error Message', detail:'Validation failed'});
-      }
+      // if(res){
+      //   this.verAlumno();
+      //   this.messageService.add({severity:'success', summary: 'Registro Eliminado', detail:'Order submitted'});
+      // }
+      // else{
+      //   this.messageService.add({severity:'error', summary: 'Error Message', detail:'Validation failed'});
+      // }
     });
   }
   
@@ -117,12 +124,44 @@ export class AlumnoComponent implements OnInit {
        console.log(res);
        if(res){
         this.verAlumno();
-        this.messageService.add({severity:'success', summary: 'Registro Eliminado', detail:'Order submitted'});
+        // this.messageService.add({severity:'success', summary: 'Registro Eliminado', detail:'Order submitted'});
       }
       else{
         this.messageService.add({severity:'error', summary: 'Error Message', detail:'Validation failed'});
       }
     });
+  }
+
+  //signalR
+
+  ConnectionHub(){
+    this._hubConnection = new signalR.HubConnectionBuilder()
+    .withUrl(this.zeldaHub)
+    .build();
+    this._hubConnection.on("InsertAlumn",(parametro) => {
+      this.verAlumno();
+      this.messageService.add({severity:'success',summary:'Insertado Alumno: '+ parametro.nombre ,detail:'Order submited'});
+
+    });
+
+    this._hubConnection.on("EliminarAlumn",() => {
+      this.verAlumno();
+      this.messageService.add({severity:'success',summary:'Eliminar',detail:'Order submited'});
+
+    });
+
+
+    this._hubConnection.on("ActualizarAlumn",(parametro) => {
+      this.verAlumno();
+      this.messageService.add({severity:'success',summary:'Actualizado id:' + parametro,detail:'Order submited'});
+
+    });
+
+
+    this._hubConnection
+    .start()
+    .then(() => console.log("Hub Funcionando!"))
+    .catch(()=> console.log("Hub no funcionando :(")) 
   }
 
 }

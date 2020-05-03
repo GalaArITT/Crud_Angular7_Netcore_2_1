@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Crud_NetCore_2_1_Angular_7.Data.Interfaces;
 using Crud_NetCore_2_1_Angular_7.Data.Repositorios;
+using Crud_NetCore_2_1_Angular_7.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,6 +29,7 @@ namespace Crud_NetCore_2_1_Angular_7
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR().AddMessagePackProtocol();
             services.AddTransient<IAlumnosRepository>(x => new AlumnosRepository(Configuration[conexion]));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -46,6 +48,8 @@ namespace Crud_NetCore_2_1_Angular_7
             app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials());
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            app.UseSignalR(x => x.MapHub<HubAlerta>("/hubAlertas"));
         }
     }
 }

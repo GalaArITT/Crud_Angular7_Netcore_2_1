@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Crud_NetCore_2_1_Angular_7.Data.Interfaces;
+using Crud_NetCore_2_1_Angular_7.Hubs;
 using Crud_NetCore_2_1_Angular_7.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Crud_NetCore_2_1_Angular_7.Controllers
 {
@@ -14,9 +16,11 @@ namespace Crud_NetCore_2_1_Angular_7.Controllers
     public class AlumnoController : ControllerBase
     {
         private readonly IAlumnosRepository al;
-        public AlumnoController(IAlumnosRepository al)
+        private readonly IHubContext<HubAlerta> hub;
+        public AlumnoController(IAlumnosRepository al, IHubContext<HubAlerta> hub)
         {
             this.al = al;
+            this.hub = hub;
         }
         [HttpGet("[action]")]
         public async Task<IActionResult> Get()
@@ -34,6 +38,8 @@ namespace Crud_NetCore_2_1_Angular_7.Controllers
         {
             try
             {
+                hub.Clients.All.SendAsync("InsertAlumn",alumnos);
+                //var p = al.InsertarAlumno(alumnos);
                 return Ok(al.InsertarAlumno(alumnos));
             }
             catch(Exception ex)
@@ -46,6 +52,7 @@ namespace Crud_NetCore_2_1_Angular_7.Controllers
         {
             try
             {
+                hub.Clients.All.SendAsync("EliminarAlumn");
                 return Ok(al.Eliminar(id));
             }
             catch (Exception ex)
@@ -58,6 +65,7 @@ namespace Crud_NetCore_2_1_Angular_7.Controllers
         {
             try
             {
+                hub.Clients.All.SendAsync("ActualizarAlumn",id);
                 return Ok(al.EditarAlumno(id,alumnos));
             }
             catch (Exception ex)
